@@ -34,12 +34,19 @@ jobs:
           chmod +x /tmp/fakebin/systemctl
           echo "/tmp/fakebin" >> "$GITHUB_PATH"
 
+      - name: Build local release (fake assets)
+        run: |
+          mkdir -p dist
+          CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o dist/potoo-linux-amd64 ./cmd/potoo
+          (cd dist && sha256sum potoo-linux-amd64 > checksums.txt)
+          cat dist/checksums.txt
+
       - name: Run install.sh (dry-run)
-        run: sh install.sh --dry-run
+        run: sh install.sh --dry-run --version 9.9.9 --base-url "file://$GITHUB_WORKSPACE/dist"
 
       - name: Run install.sh (real install)
         run: |
-          POTOO_INSTALL_ROOT=/tmp/potoo-test sh install.sh
+          POTOO_INSTALL_ROOT=/tmp/potoo-test sh install.sh --version 9.9.9 --base-url "file://$GITHUB_WORKSPACE/dist"
           test -x /tmp/potoo-test/opt/potoo/bin/potoo
           test -f /tmp/potoo-test/etc/potoo/potoo.env
           test -f /tmp/potoo-test/etc/systemd/system/potoo.service
