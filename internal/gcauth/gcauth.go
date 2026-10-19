@@ -1,7 +1,7 @@
 // Package gcauth valida tokens de la API de GoatCounter contra su base de
 // datos (solo lectura), delegando en GoatCounter la identidad del ecosistema:
 // un token de GoatCounter con permiso de lectura de estadísticas puede
-// consultar los pipes de GhostBird, con el alcance de sitios del token.
+// consultar los pipes de Potoo, con el alcance de sitios del token.
 package gcauth
 
 import (

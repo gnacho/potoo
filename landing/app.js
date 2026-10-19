@@ -1,9 +1,9 @@
-  /* GhostBird landing: idioma, tema, count-up, FAQ, copiar, reveal y lightbox */
+  /* Potoo landing: idioma, tema, count-up, FAQ, copiar, reveal y lightbox */
 (function () {
   'use strict';
 
-  var LANG_KEY = 'ghostbird-lang';
-  var THEME_KEY = 'ghostbird-theme';
+  var LANG_KEY = 'potoo-lang';
+  var THEME_KEY = 'potoo-theme';
   var root = document.documentElement;
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var dict = I18N.es;

@@ -1,5 +1,5 @@
-// Package config carga la configuración de GhostBird: flags con fallback
-// a variables de entorno GHOSTBIRD_*.
+// Package config carga la configuración de Potoo: flags con fallback
+// a variables de entorno POTOO_*.
 package config
 
 import (
@@ -26,7 +26,7 @@ type Config struct {
 }
 
 // Load parsea flags y variables de entorno. Los flags ganan si se pasan
-// explícitamente; si no, se usa GHOSTBIRD_<NOMBRE>. Un env malformado
+// explícitamente; si no, se usa POTOO_<NOMBRE>. Un env malformado
 // falla el arranque (fail fast), nunca degrada en silencio al default.
 func Load() (*Config, error) {
 	c := &Config{}
@@ -37,7 +37,7 @@ func Load() (*Config, error) {
 	}
 
 	flag.StringVar(&c.Addr, "addr", envOr("ADDR", ":8080"), "dirección HTTP de escucha")
-	flag.StringVar(&c.DBPath, "db", envOr("DB", "data/ghostbird.db"), "ruta del fichero SQLite")
+	flag.StringVar(&c.DBPath, "db", envOr("DB", "data/potoo.db"), "ruta del fichero SQLite")
 	flag.StringVar(&c.IngestToken, "ingest-token", envOr("INGEST_TOKEN", ""), "token de ingesta para /v0/events (vacío = sin autenticación)")
 	flag.StringVar(&c.AdminToken, "admin-token", envOr("ADMIN_TOKEN", ""), "secreto HS256 de los JWT de pipes (tinybird.adminToken de Ghost; vacío = sin auth)")
 	flag.StringVar(&c.StatsToken, "stats-token", envOr("STATS_TOKEN", ""), "token estático para pipes (stats.token/local.token de Ghost)")
@@ -65,14 +65,14 @@ func Load() (*Config, error) {
 }
 
 func envOr(name, def string) string {
-	if v, ok := os.LookupEnv("GHOSTBIRD_" + name); ok && strings.TrimSpace(v) != "" {
+	if v, ok := os.LookupEnv("POTOO_" + name); ok && strings.TrimSpace(v) != "" {
 		return v
 	}
 	return def
 }
 
 func envOrBool(name string, def bool) bool {
-	v, ok := os.LookupEnv("GHOSTBIRD_" + name)
+	v, ok := os.LookupEnv("POTOO_" + name)
 	if !ok {
 		return def
 	}
@@ -80,13 +80,13 @@ func envOrBool(name string, def bool) bool {
 }
 
 func envOrInt(name string, def int) (int, error) {
-	v, ok := os.LookupEnv("GHOSTBIRD_" + name)
+	v, ok := os.LookupEnv("POTOO_" + name)
 	if !ok || strings.TrimSpace(v) == "" {
 		return def, nil
 	}
 	n, err := strconv.Atoi(strings.TrimSpace(v))
 	if err != nil {
-		return def, fmt.Errorf("GHOSTBIRD_%s=%q no es un entero", name, v)
+		return def, fmt.Errorf("POTOO_%s=%q no es un entero", name, v)
 	}
 	return n, nil
 }

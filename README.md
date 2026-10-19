@@ -1,11 +1,11 @@
-# GhostBird
+# Potoo
 
 A free, self-hosted drop-in replacement for the Tinybird backend behind
 Ghost's native analytics.
 
 One Go binary. One SQLite file. Your analytics never leave your server.
 
-**Live landing page:** [ghostbird.cloudless.club](https://ghostbird.cloudless.club/) — screenshots, feature summary and the one-liner installer.
+**Live landing page:** [potoo.cloudless.club](https://potoo.cloudless.club/) — screenshots, feature summary and the one-liner installer.
 
 **Status**: working end to end against Ghost 6.x (tested with Ghost
 6.57.1). See [Verified](#verified-against-the-real-thing). Licensed
@@ -30,7 +30,7 @@ with an analytics pipeline that self-hosters either break or surrender.
 The Ghost side is open source. The data side is not. That asymmetry is
 the gap.
 
-GhostBird fills it. It speaks the exact protocol Ghost already speaks:
+Potoo fills it. It speaks the exact protocol Ghost already speaks:
 the events API the tracker posts to, the query API the dashboard reads
 from, the JWT authentication Ghost signs on its own. Ghost does not know
 anything changed. You change two URLs in a config file and the dashboard
@@ -59,17 +59,17 @@ the queries of the Ghost admin dashboard you already have.
 **It is not** another analytics panel. If you want a standalone
 dashboard with its own charts and UI, use Umami, Plausible or
 GoatCounter (all excellent, two of them also AGPL). Those tools answer
-"what happened on my site" with a new interface to learn. GhostBird
+"what happened on my site" with a new interface to learn. Potoo
 answers a different question: "how do I keep the analytics tab of my
 Ghost install working without a cloud vendor". If you run both, they do
-not compete; they cover different needs. GhostBird additionally counts
+not compete; they cover different needs. Potoo additionally counts
 things the generic tools do not model: member status (free, paid,
 comped, gift), per-post attribution and gift-link usage.
 
 ## How it works
 
 ```
-visitor's browser      GhostBird (1 binary)              your server
+visitor's browser      Potoo (1 binary)              your server
 ─────────────────      ─────────────────────              ───────────
 ghost-stats.min.js ──► collector  POST /api/v1/page_hit
                        bots filtered, sessions signed,
@@ -85,7 +85,7 @@ Ghost server        ──► same pipes, server-side (top content,
 
 Ghost signs its own JWTs with a shared secret you set on both sides
 (`adminToken`). The token's scopes pin each query to your site's UUID,
-so one GhostBird instance can serve several Ghost sites with clean
+so one Potoo instance can serve several Ghost sites with clean
 isolation.
 
 ## Technical brief
@@ -119,7 +119,7 @@ isolation.
 Once the repository is public, the one-liner:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/gnacho/ghostbird/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/gnacho/potoo/main/install.sh | sh
 ```
 
 The script detects your platform, downloads a release binary with
@@ -132,8 +132,8 @@ including `--uninstall` and `--purge`.
 From source:
 
 ```sh
-CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o ghostbird ./cmd/ghostbird
-./ghostbird -addr 127.0.0.1:18181 -db /var/lib/ghostbird/ghostbird.db
+CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o potoo ./cmd/potoo
+./potoo -addr 127.0.0.1:18181 -db /var/lib/potoo/potoo.db
 ```
 
 ### Point Ghost at it
@@ -155,7 +155,7 @@ Then in Ghost's `config.production.json`:
 ```json
 {
   "tinybird": {
-    "workspaceId": "ghostbird",
+    "workspaceId": "potoo",
     "adminToken": "THE SAME SECRET you passed as -admin-token",
     "tracker": {
       "endpoint": "https://YOUR-SITE/ghb/api/v1/page_hit",
@@ -190,11 +190,11 @@ resolvable hostname (or the same public `/ghb/` path). With
 ## Shared identity with GoatCounter (optional)
 
 If you also run [GoatCounter](https://github.com/arp242/goatcounter), point
-GhostBird at its database and GoatCounter API tokens become a third way to
+Potoo at its database and GoatCounter API tokens become a third way to
 authenticate pipe reads:
 
 ```sh
-./ghostbird -goatcounter-db /path/to/goatcounter/db.sqlite3 ...
+./potoo -goatcounter-db /path/to/goatcounter/db.sqlite3 ...
 ```
 
 Rules (mirroring GoatCounter's own semantics, from its source):
@@ -219,7 +219,7 @@ VALUES (10, '507a78ce-6b95-4913-884b-18138db8f048');
 ```
 
 One identity system for your whole analytics stack: the same token that
-reads GoatCounter reads GhostBird, with the same permission model.
+reads GoatCounter reads Potoo, with the same permission model.
 
 ## Verified against the real thing
 
@@ -232,7 +232,7 @@ Two kinds of verification, both reproducible from this repo:
    same output, including tie-order tolerance.
 2. **End to end.** A real browser visiting a real Ghost 6.57.1 site
    produces events in the database, and the admin dashboard renders
-   visitors, sessions and sources from GhostBird. This included catching
+   visitors, sessions and sources from Potoo. This included catching
    a detail invisible to any spec reading: the dashboard's chart library
    calls the query API with POST and the token in the query string, not
    as a Bearer header.
@@ -244,7 +244,7 @@ lives in the commit history.
 
 ## Roadmap
 
-- ✅ **v0.5.0 released** — public repository, tagged releases and a live landing page at [ghostbird.cloudless.club](https://ghostbird.cloudless.club/).
+- ✅ **v0.5.0 released** — public repository, tagged releases and a live landing page at [potoo.cloudless.club](https://potoo.cloudless.club/).
 - CI/CD workflows for tests and releases.
 - Optional PostgreSQL backend for very high traffic sites.
 - Rate limiting and per-site quotas in-process (nginx covers it today).
@@ -261,12 +261,12 @@ lives in the commit history.
 - The single-binary-and-a-database philosophy follows
   [GoatCounter](https://github.com/arp242/goatcounter)'s example.
 
-GhostBird is an independent project. It is not affiliated with, endorsed
+Potoo is an independent project. It is not affiliated with, endorsed
 by, or connected to the Ghost Foundation or Tinybird.
 
 ## License
 
 AGPL-3.0. See [LICENSE](LICENSE). The vendor credits above keep their
-own licenses. If you run a modified GhostBird on a public server, the
+own licenses. If you run a modified Potoo on a public server, the
 AGPL asks you to offer your changes back to everyone: that clause is
 the point, not a footnote.

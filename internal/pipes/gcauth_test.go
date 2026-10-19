@@ -10,9 +10,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/config"
-	"github.com/gnacho/ghostbird/internal/gcauth"
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/config"
+	"github.com/gnacho/potoo/internal/gcauth"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // createGCFixture crea una BD GoatCounter mínima (mismo schema que usa

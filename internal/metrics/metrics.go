@@ -80,37 +80,37 @@ func (m *Metrics) Render() string {
 		return ""
 	}
 	var b string
-	b += "# HELP ghostbird_uptime_seconds Segundos desde el arranque\n# TYPE ghostbird_uptime_seconds gauge\n"
-	b += fmt.Sprintf("ghostbird_uptime_seconds %d\n", int64(time.Since(m.start).Seconds()))
+	b += "# HELP potoo_uptime_seconds Segundos desde el arranque\n# TYPE potoo_uptime_seconds gauge\n"
+	b += fmt.Sprintf("potoo_uptime_seconds %d\n", int64(time.Since(m.start).Seconds()))
 
-	b += "# HELP ghostbird_page_hits_total Page hits aceptados por el collector\n# TYPE ghostbird_page_hits_total counter\n"
-	b += fmt.Sprintf("ghostbird_page_hits_total %d\n", m.PageHits.Load())
-	b += "# HELP ghostbird_bots_total Hits filtrados como bot\n# TYPE ghostbird_bots_total counter\n"
-	b += fmt.Sprintf("ghostbird_bots_total %d\n", m.Bots.Load())
-	b += "# HELP ghostbird_v0_events_requests_total Requests a /v0/events\n# TYPE ghostbird_v0_events_requests_total counter\n"
-	b += fmt.Sprintf("ghostbird_v0_events_requests_total %d\n", m.V0Events.Load())
-	b += "# HELP ghostbird_events_accepted_total Eventos nuevos almacenados\n# TYPE ghostbird_events_accepted_total counter\n"
-	b += fmt.Sprintf("ghostbird_events_accepted_total %d\n", m.Accepted.Load())
-	b += "# HELP ghostbird_events_dupes_total Duplicados descartados por dedup\n# TYPE ghostbird_events_dupes_total counter\n"
-	b += fmt.Sprintf("ghostbird_events_dupes_total %d\n", m.Dupes.Load())
-	b += "# HELP ghostbird_ingest_errors_total Errores de almacenamiento en ingesta\n# TYPE ghostbird_ingest_errors_total counter\n"
-	b += fmt.Sprintf("ghostbird_ingest_errors_total %d\n", m.IngestErrors.Load())
+	b += "# HELP potoo_page_hits_total Page hits aceptados por el collector\n# TYPE potoo_page_hits_total counter\n"
+	b += fmt.Sprintf("potoo_page_hits_total %d\n", m.PageHits.Load())
+	b += "# HELP potoo_bots_total Hits filtrados como bot\n# TYPE potoo_bots_total counter\n"
+	b += fmt.Sprintf("potoo_bots_total %d\n", m.Bots.Load())
+	b += "# HELP potoo_v0_events_requests_total Requests a /v0/events\n# TYPE potoo_v0_events_requests_total counter\n"
+	b += fmt.Sprintf("potoo_v0_events_requests_total %d\n", m.V0Events.Load())
+	b += "# HELP potoo_events_accepted_total Eventos nuevos almacenados\n# TYPE potoo_events_accepted_total counter\n"
+	b += fmt.Sprintf("potoo_events_accepted_total %d\n", m.Accepted.Load())
+	b += "# HELP potoo_events_dupes_total Duplicados descartados por dedup\n# TYPE potoo_events_dupes_total counter\n"
+	b += fmt.Sprintf("potoo_events_dupes_total %d\n", m.Dupes.Load())
+	b += "# HELP potoo_ingest_errors_total Errores de almacenamiento en ingesta\n# TYPE potoo_ingest_errors_total counter\n"
+	b += fmt.Sprintf("potoo_ingest_errors_total %d\n", m.IngestErrors.Load())
 
-	b += "# HELP ghostbird_pipes_requests_total Queries por pipe\n# TYPE ghostbird_pipes_requests_total counter\n"
+	b += "# HELP potoo_pipes_requests_total Queries por pipe\n# TYPE potoo_pipes_requests_total counter\n"
 	m.mu.Lock()
 	for name, st := range m.pipes {
 		label := pipeLabel(name)
-		b += fmt.Sprintf("ghostbird_pipes_requests_total{pipe=%q} %d\n", label, st.Reqs.Load())
+		b += fmt.Sprintf("potoo_pipes_requests_total{pipe=%q} %d\n", label, st.Reqs.Load())
 	}
-	b += "# HELP ghostbird_pipes_duration_ms_sum Milisegundos totales por pipe\n# TYPE ghostbird_pipes_duration_ms_sum counter\n"
+	b += "# HELP potoo_pipes_duration_ms_sum Milisegundos totales por pipe\n# TYPE potoo_pipes_duration_ms_sum counter\n"
 	for name, st := range m.pipes {
 		label := pipeLabel(name)
-		b += fmt.Sprintf("ghostbird_pipes_duration_ms_sum{pipe=%q} %d\n", label, st.DurMs.Load())
+		b += fmt.Sprintf("potoo_pipes_duration_ms_sum{pipe=%q} %d\n", label, st.DurMs.Load())
 	}
-	b += "# HELP ghostbird_pipes_slow_total Pipes por encima de 500 ms\n# TYPE ghostbird_pipes_slow_total counter\n"
+	b += "# HELP potoo_pipes_slow_total Pipes por encima de 500 ms\n# TYPE potoo_pipes_slow_total counter\n"
 	for name, st := range m.pipes {
 		label := pipeLabel(name)
-		b += fmt.Sprintf("ghostbird_pipes_slow_total{pipe=%q} %d\n", label, st.Slow.Load())
+		b += fmt.Sprintf("potoo_pipes_slow_total{pipe=%q} %d\n", label, st.Slow.Load())
 	}
 	extra := m.extra
 	m.mu.Unlock()
@@ -125,9 +125,10 @@ func (m *Metrics) Render() string {
 // pipeLabel higieniza el nombre del pipe para label de Prometheus.
 func pipeLabel(name string) string {
 	out := make([]byte, 0, len(name))
-	for _, c := range name {
+	for i := 0; i < len(name); i++ {
+		c := name[i]
 		if (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '_' {
-			out = append(out, byte(c))
+			out = append(out, c)
 		}
 	}
 	return string(out)
@@ -137,12 +138,12 @@ func pipeLabel(name string) string {
 func DBSizeLines(dbPath string) []string {
 	var lines []string
 	if fi, err := os.Stat(dbPath); err == nil {
-		lines = append(lines, "# HELP ghostbird_db_size_bytes Tamaño del fichero SQLite\n# TYPE ghostbird_db_size_bytes gauge",
-			fmt.Sprintf("ghostbird_db_size_bytes %d", fi.Size()))
+		lines = append(lines, "# HELP potoo_db_size_bytes Tamaño del fichero SQLite\n# TYPE potoo_db_size_bytes gauge",
+			fmt.Sprintf("potoo_db_size_bytes %d", fi.Size()))
 	}
 	if fi, err := os.Stat(dbPath + "-wal"); err == nil {
-		lines = append(lines, "# HELP ghostbird_db_wal_bytes Tamaño del WAL\n# TYPE ghostbird_db_wal_bytes gauge",
-			fmt.Sprintf("ghostbird_db_wal_bytes %d", fi.Size()))
+		lines = append(lines, "# HELP potoo_db_wal_bytes Tamaño del WAL\n# TYPE potoo_db_wal_bytes gauge",
+			fmt.Sprintf("potoo_db_wal_bytes %d", fi.Size()))
 	}
 	return lines
 }

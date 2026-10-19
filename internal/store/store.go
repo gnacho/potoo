@@ -117,9 +117,9 @@ var migrations = []string{
 	) WHERE rn = 1
 	ON CONFLICT(site_uuid, session_id) DO NOTHING;
 	`,
-	// v4: mapeo sitio GoatCounter → site_uuid GhostBird, para tokens de
+	// v4: mapeo sitio GoatCounter → site_uuid Potoo, para tokens de
 	// GoatCounter con alcance restringido (gcauth). Un sitio GC puede
-	// mapear a varios sites de GhostBird y viceversa.
+	// mapear a varios sites de Potoo y viceversa.
 	`
 	CREATE TABLE IF NOT EXISTS gc_site_map (
 		gc_site_id INTEGER NOT NULL,
@@ -443,7 +443,7 @@ func (s *Store) Backup(destPath string) error {
 	return nil
 }
 
-// MappedSiteUUIDs devuelve los site_uuid de GhostBird mapeados a los IDs de
+// MappedSiteUUIDs devuelve los site_uuid de Potoo mapeados a los IDs de
 // sitio GoatCounter dados (tabla gc_site_map, migración v4).
 func (s *Store) MappedSiteUUIDs(gcIDs []int64) ([]string, error) {
 	if len(gcIDs) == 0 {

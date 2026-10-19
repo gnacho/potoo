@@ -203,7 +203,7 @@ func (p *Params) sessionWindow() (from, to int64) {
 
 // giftBool: true = gift_link != ”, false = gift_link = ”.
 func giftBool(v string) bool {
-	return !(v == "false" || v == "0")
+	return v != "false" && v != "0"
 }
 
 // hitFilters construye el WHERE hit-level compartido (sesiones con AL MENOS

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // TestSourceVacioFiltraDirecto reproduce el P1 del bug-hunt: Ghost manda

@@ -8,10 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/config"
-	"github.com/gnacho/ghostbird/internal/gcauth"
-	"github.com/gnacho/ghostbird/internal/metrics"
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/config"
+	"github.com/gnacho/potoo/internal/gcauth"
+	"github.com/gnacho/potoo/internal/metrics"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // Handler sirve GET /v0/pipes/{name}.json con auth JWT HS256 (o token

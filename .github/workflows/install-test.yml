@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: stable
 
@@ -39,8 +39,8 @@ jobs:
 
       - name: Run install.sh (real install)
         run: |
-          GHOSTBIRD_INSTALL_ROOT=/tmp/ghostbird-test sh install.sh
-          test -x /tmp/ghostbird-test/opt/ghostbird/bin/ghostbird
-          test -f /tmp/ghostbird-test/etc/ghostbird/ghostbird.env
-          test -f /tmp/ghostbird-test/etc/systemd/system/ghostbird.service
-          /tmp/ghostbird-test/opt/ghostbird/bin/ghostbird -h
+          POTOO_INSTALL_ROOT=/tmp/potoo-test sh install.sh
+          test -x /tmp/potoo-test/opt/potoo/bin/potoo
+          test -f /tmp/potoo-test/etc/potoo/potoo.env
+          test -f /tmp/potoo-test/etc/systemd/system/potoo.service
+          /tmp/potoo-test/opt/potoo/bin/potoo -h

@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // eventsBodyLimit: batches del AS de 50 eventos (~50-100 KB); margen holgado.
@@ -116,7 +116,7 @@ func (s *Server) eventoDesdeProcesado(line []byte, now time.Time) (store.Event, 
 		sessionID = "0" // mv_hits: coalesce(session_id, '0')
 	}
 
-	var ts int64 = now.Unix()
+	ts := now.Unix()
 	if !e.RootTs.IsZero() {
 		ts = e.RootTs.Unix()
 	}

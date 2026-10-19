@@ -1,16 +1,16 @@
 #!/bin/sh
 # =============================================================================
-# install.sh — Instalador one-liner de GhostBird (binario Go estático)
+# install.sh — Instalador one-liner de Potoo (binario Go estático)
 #
-# GhostBird: drop-in replacement self-hosted de Tinybird para las estadísticas
+# Potoo: drop-in replacement self-hosted de Tinybird para las estadísticas
 # nativas de Ghost 6.x. Un binario, una SQLite, cero config obligatoria.
 #
 # Objetivo del one-liner (REQUIERE repo público; hoy el repo es privado):
-#   curl -fsSL https://raw.githubusercontent.com/gnacho/ghostbird/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/gnacho/potoo/main/install.sh | sh
 #
 # Mientras el repo sea privado, descarga el script y autentícalo:
 #   GITHUB_TOKEN=ghp_xxx sh install.sh
-#   GITHUB_TOKEN=ghp_xxx sh install.sh --repo gnacho/ghostbird
+#   GITHUB_TOKEN=ghp_xxx sh install.sh --repo gnacho/potoo
 #
 # Uso (descargado, recomendado para auditar antes):
 #   sh install.sh                      # instala o actualiza (idempotente)
@@ -23,40 +23,40 @@
 #   sh install.sh --help
 #
 # Convención de release (la genera .github/workflows/release.yml):
-#   - Artefactos:  ghostbird-linux-<goarch>  (binario suelto; goarch = amd64 | arm64)
+#   - Artefactos:  potoo-linux-<goarch>  (binario suelto; goarch = amd64 | arm64)
 #   - Checksums:   checksums.txt (formato sha256sum: "<hash>  <fichero>")
 #
 # Layout instalado:
-#   /opt/ghostbird/bin/ghostbird           binario (0755 root:root)
-#   /etc/ghostbird/ghostbird.env           config y secretos (0600; EnvironmentFile)
-#   /var/lib/ghostbird/                    BD SQLite + backups (ghostbird:ghostbird 0750)
-#   /etc/systemd/system/ghostbird.service  unit endurecida (sandbox, sin systemd: aviso)
+#   /opt/potoo/bin/potoo           binario (0755 root:root)
+#   /etc/potoo/potoo.env           config y secretos (0600; EnvironmentFile)
+#   /var/lib/potoo/                    BD SQLite + backups (potoo:potoo 0750)
+#   /etc/systemd/system/potoo.service  unit endurecida (sandbox, sin systemd: aviso)
 #
 # Códigos de salida: 1=privilegios, 2=dependencias/recursos, 3=arch/OS no soportado,
 #   4=red/descarga, 5=verificación (checksum), 6=init no soportado, 64=uso incorrecto.
 #
 # Variable interna de pruebas (no usar en producción):
-#   GHOSTBIRD_INSTALL_ROOT=<dir>  prefija TODAS las rutas del sistema y desactiva
+#   POTOO_INSTALL_ROOT=<dir>  prefija TODAS las rutas del sistema y desactiva
 #   elevación/usuario/chown (permite E2E con stubs de systemctl sin ser root).
 # =============================================================================
 set -eu
 
 # ---------- CONFIGURACIÓN DE LA APP -------------------------------------------
-APP_NAME="ghostbird"
-APP_DESC="GhostBird (Tinybird drop-in for Ghost analytics)"
-GH_REPO="gnacho/ghostbird"          # sobreescribible con --repo (org/repo)
+APP_NAME="potoo"
+APP_DESC="Potoo (Tinybird drop-in for Ghost analytics)"
+GH_REPO="gnacho/potoo"          # sobreescribible con --repo (org/repo)
 DEF_PORT="18181"                    # detrás de nginx; 18080 lo ocupa GoatCounter
 GITHUB_TOKEN="${GITHUB_TOKEN:-}"
 
-# ---------- Rutas (GHOSTBIRD_INSTALL_ROOT = solo pruebas) ----------------------
-PREFIX="${GHOSTBIRD_INSTALL_ROOT:-}"
+# ---------- Rutas (POTOO_INSTALL_ROOT = solo pruebas) ----------------------
+PREFIX="${POTOO_INSTALL_ROOT:-}"
 TESTMODE=0
 if [ -n "$PREFIX" ]; then TESTMODE=1; fi
-BIN_DIR="${PREFIX}/opt/ghostbird/bin"
+BIN_DIR="${PREFIX}/opt/potoo/bin"
 BIN_PATH="${BIN_DIR}/${APP_NAME}"
-ENV_DIR="${PREFIX}/etc/ghostbird"
-ENV_PATH="${ENV_DIR}/ghostbird.env"
-DATA_DIR="${PREFIX}/var/lib/ghostbird"
+ENV_DIR="${PREFIX}/etc/potoo"
+ENV_PATH="${ENV_DIR}/potoo.env"
+DATA_DIR="${PREFIX}/var/lib/potoo"
 UNIT_NAME="${APP_NAME}.service"
 UNIT_PATH="${PREFIX}/etc/systemd/system/${UNIT_NAME}"
 
@@ -147,7 +147,7 @@ Uso: sh $0 [opciones]
 
 Variables de entorno:
   GITHUB_TOKEN         Token con scope repo para descargar de un repo PRIVADO
-  GHOSTBIRD_INSTALL_ROOT  (solo pruebas) prefija las rutas del sistema
+  POTOO_INSTALL_ROOT  (solo pruebas) prefija las rutas del sistema
 
 Sin TTY (pipe) el modo desatendido es automático; si el puerto por defecto
 está ocupado se elige el siguiente libre (hasta +20) y se avisa.
@@ -293,7 +293,7 @@ detect_arch() {
         x86_64|amd64)  GOARCH="amd64" ;;
         aarch64|arm64) GOARCH="arm64" ;;
         *) fatal 3 "arquitectura no soportada: $(uname -m).
-  GhostBird publica binarios solo para linux/amd64 y linux/arm64." ;;
+  Potoo publica binarios solo para linux/amd64 y linux/arm64." ;;
     esac
     ok "arquitectura: $(uname -m) → linux/${GOARCH}"
 }
@@ -477,7 +477,7 @@ check_resources() {
             fi
             APP_PORT="$(choose_port "$APP_PORT")" \
                 || fatal 2 "puerto ${APP_PORT} ocupado y ninguno libre en los 20 siguientes"
-            warn "puerto por defecto ocupado: GhostBird escuchará en ${APP_PORT}"
+            warn "puerto por defecto ocupado: Potoo escuchará en ${APP_PORT}"
         else
             ok "puerto ${APP_PORT} libre"
         fi
@@ -533,7 +533,7 @@ build_from_source() {
     ( cd "${TMPDIR_WORK}/src" && \
       CGO_ENABLED=0 go build -trimpath \
           -ldflags "-s -w -X main.version=${REL_NUM}" \
-          -o "${TMPDIR_WORK}/${APP_NAME}" ./cmd/ghostbird ) \
+          -o "${TMPDIR_WORK}/${APP_NAME}" ./cmd/potoo ) \
         || fatal 2 "la compilación falló (revisa la salida de go build)"
     [ -s "${TMPDIR_WORK}/${APP_NAME}" ] || fatal 5 "la compilación no produjo binario"
     chmod 0755 "${TMPDIR_WORK}/${APP_NAME}"
@@ -621,20 +621,20 @@ install_binary() {
 # el token si faltaba). El token generado se muestra UNA sola vez.
 write_env() {
     if [ -f "$ENV_PATH" ]; then
-        if grep -q '^GHOSTBIRD_ADMIN_TOKEN=' "$ENV_PATH"; then
+        if grep -q '^POTOO_ADMIN_TOKEN=' "$ENV_PATH"; then
             ok "env conservado: ${ENV_PATH} (token existente, no se re-imprime)"
         else
             ADMIN_TOKEN="$(gen_token)"
             [ -n "$ADMIN_TOKEN" ] || fatal 2 "no se pudo generar el token aleatorio"
             if [ "$DRY_RUN" = "1" ]; then
-                info "[DRY-RUN] añadiría GHOSTBIRD_ADMIN_TOKEN al env existente"
+                info "[DRY-RUN] añadiría POTOO_ADMIN_TOKEN al env existente"
             else
-                printf 'GHOSTBIRD_ADMIN_TOKEN=%s\n' "$ADMIN_TOKEN" >> "$ENV_PATH"
-                warn "env existía sin GHOSTBIRD_ADMIN_TOKEN: token generado y añadido"
+                printf 'POTOO_ADMIN_TOKEN=%s\n' "$ADMIN_TOKEN" >> "$ENV_PATH"
+                warn "env existía sin POTOO_ADMIN_TOKEN: token generado y añadido"
             fi
             TOKEN_GENERATED=1
         fi
-        FINAL_ADDR="$(grep '^GHOSTBIRD_ADDR=' "$ENV_PATH" | tail -n1 | cut -d= -f2-)"
+        FINAL_ADDR="$(grep '^POTOO_ADDR=' "$ENV_PATH" | tail -n1 | cut -d= -f2-)"
         if [ -z "$FINAL_ADDR" ]; then FINAL_ADDR="127.0.0.1:${APP_PORT}"; fi
         return
     fi
@@ -643,24 +643,24 @@ write_env() {
     FINAL_ADDR="127.0.0.1:${APP_PORT}"
     TOKEN_GENERATED=1
     if [ "$DRY_RUN" = "1" ]; then
-        info "[DRY-RUN] escribiría ${ENV_PATH} (0600) con GHOSTBIRD_* y token aleatorio"
+        info "[DRY-RUN] escribiría ${ENV_PATH} (0600) con POTOO_* y token aleatorio"
         return
     fi
-    _envtmp="${TMPDIR_WORK}/ghostbird.env"
+    _envtmp="${TMPDIR_WORK}/potoo.env"
     cat > "$_envtmp" <<EOF
-# GhostBird — config del servicio. Edita y reinicia: systemctl restart ${APP_NAME}
+# Potoo — config del servicio. Edita y reinicia: systemctl restart ${APP_NAME}
 # (mando: el env se aplica cuando ExecStart no pasa el flag equivalente)
-GHOSTBIRD_ADDR=${FINAL_ADDR}
-GHOSTBIRD_DB=${DATA_DIR}/ghostbird.db
-GHOSTBIRD_ADMIN_TOKEN=${ADMIN_TOKEN}
-GHOSTBIRD_BACKUP_DIR=${DATA_DIR}/backups
+POTOO_ADDR=${FINAL_ADDR}
+POTOO_DB=${DATA_DIR}/potoo.db
+POTOO_ADMIN_TOKEN=${ADMIN_TOKEN}
+POTOO_BACKUP_DIR=${DATA_DIR}/backups
 
 # Opcionales (descomenta para cambiar):
-# GHOSTBIRD_INGEST_TOKEN=secreto        # auth de /v0/events (vacío = sin auth)
-# GHOSTBIRD_STATS_TOKEN=                # token estático alternativo de pipes
-# GHOSTBIRD_RETENTION_DAYS=0            # días de eventos raw (0 = ilimitado)
-# GHOSTBIRD_LOG_LEVEL=info              # debug|info|warn|error
-# GHOSTBIRD_TRUST_PROXY=1               # primera IP de X-Forwarded-For
+# POTOO_INGEST_TOKEN=secreto        # auth de /v0/events (vacío = sin auth)
+# POTOO_STATS_TOKEN=                # token estático alternativo de pipes
+# POTOO_RETENTION_DAYS=0            # días de eventos raw (0 = ilimitado)
+# POTOO_LOG_LEVEL=info              # debug|info|warn|error
+# POTOO_TRUST_PROXY=1               # primera IP de X-Forwarded-For
 EOF
     run mkdir -p "$ENV_DIR"
     if [ "$TESTMODE" = "0" ]; then
@@ -693,7 +693,7 @@ install_service() {
   set -a; . ${ENV_PATH}; set +a; exec ${BIN_PATH}"
         return 0
     fi
-    _unittmp="${TMPDIR_WORK}/ghostbird.service"
+    _unittmp="${TMPDIR_WORK}/potoo.service"
     cat > "$_unittmp" <<EOF
 [Unit]
 Description=${APP_DESC}
@@ -794,7 +794,7 @@ do_uninstall() {
     fi
     run rm -f "$BIN_PATH" "${BIN_PATH}.bak"
     run rmdir "$BIN_DIR" 2>/dev/null || true
-    run rmdir "${PREFIX}/opt/ghostbird" 2>/dev/null || true
+    run rmdir "${PREFIX}/opt/potoo" 2>/dev/null || true
     if [ "$TESTMODE" = "0" ] && id "$APP_NAME" >/dev/null 2>&1; then
         run userdel "$APP_NAME" 2>/dev/null || run deluser "$APP_NAME" 2>/dev/null \
             || warn "no se pudo borrar el usuario '${APP_NAME}' (bórralo a mano)"
@@ -843,9 +843,9 @@ print_summary() {
     if [ "$TOKEN_GENERATED" = "1" ] && [ "$DRY_RUN" = "1" ]; then
         printf '\n   Admin token: se generará al instalar de verdad (y se mostrará entonces)\n'
     elif [ "$TOKEN_GENERATED" = "1" ]; then
-        printf '\n   GHOSTBIRD_ADMIN_TOKEN (GUÁRDALO, no se volverá a mostrar):\n     %s\n' "$ADMIN_TOKEN"
+        printf '\n   POTOO_ADMIN_TOKEN (GUÁRDALO, no se volverá a mostrar):\n     %s\n' "$ADMIN_TOKEN"
         printf '\n   Config de Ghost (config.production.json, mismo secreto):\n'
-        printf '     "tinybird": { "workspaceId": "ghostbird-local",\n'
+        printf '     "tinybird": { "workspaceId": "potoo-local",\n'
         printf '                   "adminToken": "%s", ... }\n' "$ADMIN_TOKEN"
     else
         printf '\n   Admin token: existente en %s (no se re-imprime)\n' "$ENV_PATH"

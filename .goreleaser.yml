@@ -1,11 +1,11 @@
 version: 2
 
-project_name: ghostbird
+project_name: potoo
 
 builds:
-  - id: ghostbird
-    main: ./cmd/ghostbird
-    binary: ghostbird
+  - id: potoo
+    main: ./cmd/potoo
+    binary: potoo
     env:
       - CGO_ENABLED=0
     goos:
@@ -43,6 +43,6 @@ changelog:
 release:
   github:
     owner: gnacho
-    name: ghostbird
+    name: potoo
   draft: false
   prerelease: auto

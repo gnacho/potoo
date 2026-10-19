@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/ingest"
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/ingest"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // seedFixture importa el NDJSON de Tinybird replicando la lógica de mv_hits

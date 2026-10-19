@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // Engine ejecuta los pipes contra el store.

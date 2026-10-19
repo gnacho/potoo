@@ -1,4 +1,4 @@
-# DESIGN.md — Landing GhostBird (ghostbird.cloudless.club)
+# DESIGN.md — Landing Potoo (potoo.cloudless.club)
 
 Fuente de verdad visual de la landing. Si CSS y este fichero divergen, manda este fichero.
 
@@ -14,7 +14,7 @@ Fuente de verdad visual de la landing. Si CSS y este fichero divergen, manda est
 
 ## Qué se tomó de Luminex y cómo se adaptó
 
-| Elemento Luminex | Adaptación GhostBird |
+| Elemento Luminex | Adaptación Potoo |
 |---|---|
 | Nav sticky flotante | Pill glass flotante (sticky top 10px) con logo pájaro, anclas y CTA pill "Instalar" |
 | Hero con eyebrow pill + headline con palabra gradiente + doble CTA + visual | Mockup del dashboard de Ghost reconstruido en HTML/CSS glass: tarjeta con KPI, sparkline SVG y mini-stats, más tarjeta terminal con `systemctl status`. Nada de imagen 3D ni stock |
@@ -27,7 +27,7 @@ Fuente de verdad visual de la landing. Si CSS y este fichero divergen, manda est
 | Expertise 3 columnas | Tres compromisos: AGPL para siempre / Community driven / Los datos no salen |
 | Industries grid | Grid "para quién": publishers, comunidades, agencias, puristas de privacidad |
 | FAQ acordeón | 5 preguntas reales del README, acordeón animado con grid-rows y aria-expanded |
-| CTA final "Discover the future" | "Instala GhostBird hoy" con one-liner curl y build desde fuente, botones copiar |
+| CTA final "Discover the future" | "Instala Potoo hoy" con one-liner curl y build desde fuente, botones copiar |
 | Marquee de texto final | Frases separadas por · en scroll infinito (Self-hosted · AGPL-3.0 · ...) |
 | Footer | Logo + club + Ko-fi + disclaimer no-afiliación + copyright |
 
@@ -135,9 +135,9 @@ botón de cerrar y devolución al disparador.
   canonical + hreflang es/en/x-default, JSON-LD SoftwareApplication +
   Organization + 2 ImageObject (capturas) + FAQPage, robots.txt, sitemap.xml.
 - **i18n**: diccionario único `i18n.js` (ES/EN paridad verificada por script),
-  auto por navegador + `?hl=` + localStorage `ghostbird-lang`; selector ES/EN.
+  auto por navegador + `?hl=` + localStorage `potoo-lang`; selector ES/EN.
 - **Temas**: dark por defecto (Luminex es dark-first); toggle sol/luna con
-  persistencia `ghostbird-theme` y meta theme-color dinámica.
+  persistencia `potoo-theme` y meta theme-color dinámica.
 
 ## Auditoría anti-slop (resultado)
 
