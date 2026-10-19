@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "lib": ["dom", "es2018"],
+    "module": "none",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "rootDir": "src",
+    "outDir": "."
+  },
+  "files": ["src/i18n.ts", "src/app.ts"]
+}

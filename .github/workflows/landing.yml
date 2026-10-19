@@ -1,0 +1,41 @@
+name: Landing TS
+
+on:
+  push:
+    branches: [main]
+    paths: ["landing/**", ".github/workflows/landing.yml"]
+  pull_request:
+    paths: ["landing/**", ".github/workflows/landing.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  typecheck:
+    name: Landing typecheck + build parity
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: landing/package-lock.json
+
+      - name: Install dependencies
+        working-directory: landing
+        run: npm ci --no-fund --no-audit
+
+      - name: Type-check
+        working-directory: landing
+        run: npm run check
+
+      - name: Build
+        working-directory: landing
+        run: npm run build
+
+      - name: Committed JS matches build
+        run: git diff --exit-code -- landing/app.js landing/i18n.js
