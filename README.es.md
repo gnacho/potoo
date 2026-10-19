@@ -1,14 +1,14 @@
-# GhostBird
+# Potoo
 
 Drop-in replacement **self-hosted de Tinybird** para las estadísticas nativas de Ghost 6.x.
 Filosofía GoatCounter: **un binario Go + un fichero SQLite + cero configuración obligatoria**.
 Ghost sigue creyendo que habla con Tinybird; solo cambias la URL de conexión.
 
-**Landing pública:** [ghostbird.cloudless.club](https://ghostbird.cloudless.club/) — capturas, resumen de funciones e instalador one-liner.
+**Landing pública:** [potoo.cloudless.club](https://potoo.cloudless.club/) — capturas, resumen de funciones e instalador one-liner.
 
 ```
 ┌──────────────┐  1. page_hit   ┌────────────────────────────┐        ┌──────────────────┐
-│ Visitante    │───────────────►│  GhostBird (Go, 1 binario) │───────►│ SQLite (default) │
+│ Visitante    │───────────────►│  Potoo (Go, 1 binario) │───────►│ SQLite (default) │
 │ (ghost-stats │  CORS + 202    │  · collector /api/v1/page │        │ PostgreSQL (opt) │
 │  .min.js)    │                │  · ingesta /v0/events      │        └──────────────────┘
 └──────────────┘                │  · pipes /v0/pipes/*.json │                 ▲
@@ -35,18 +35,18 @@ Ghost sigue creyendo que habla con Tinybird; solo cambias la URL de conexión.
 ## Instalación rápida
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/gnacho/ghostbird/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/gnacho/potoo/main/install.sh | sh
 ```
 
 El instalador detecta `amd64`/`arm64`, descarga el binario del último release, verifica el
-checksum con `sha256sum`, crea el usuario `ghostbird` y despliega el binario en
-`/opt/ghostbird/bin/ghostbird`. También instala la unidad systemd
-(`/etc/systemd/system/ghostbird.service`) y el fichero de entorno
-(`/etc/ghostbird/ghostbird.env`). Al finalizar muestra el token de ingesta y el comando
+checksum con `sha256sum`, crea el usuario `potoo` y despliega el binario en
+`/opt/potoo/bin/potoo`. También instala la unidad systemd
+(`/etc/systemd/system/potoo.service`) y el fichero de entorno
+(`/etc/potoo/potoo.env`). Al finalizar muestra el token de ingesta y el comando
 para arrancar el servicio:
 
 ```sh
-systemctl enable --now ghostbird
+systemctl enable --now potoo
 ```
 
 Requisitos:
@@ -81,13 +81,13 @@ lo auto-firma Ghost con un secreto compartido, y la entrega es at-least-once (de
 | 0. Reconocimiento | ✅ Completada | Contrato documentado (docs/). |
 | 1. MVP ingesta | ✅ Completada | Single binary: collector `POST /api/v1/page_hit` (bots, UA, session_id) + `POST /v0/events` (compat TrafficAnalytics) + SQLite + CORS + `/healthz`. |
 | 2. Pipes lectura | ✅ Completada | 13 pipes v1 + JWT HS256 scoped + `filtered_sessions` en SQLite. **Tests de fidelidad: la suite YAML oficial de Tinybird pasa entera contra el mismo fixture.** |
-| 3. Integración Ghost | ✅ Completada | Verificado end-to-end con Ghost 6.57.1 real: tracker en el HTML, page_hit del navegador real almacenado, JWT firmado por Ghost, dashboard Admin pintando "Unique visitors" y "online" desde GhostBird. |
+| 3. Integración Ghost | ✅ Completada | Verificado end-to-end con Ghost 6.57.1 real: tracker en el HTML, page_hit del navegador real almacenado, JWT firmado por Ghost, dashboard Admin pintando "Unique visitors" y "online" desde Potoo. |
 | 4. Robustez | 🔶 Esencial hecha | Job nocturno: purge de sales, retención configurable (`-retention-days`), backup diario verificado con VACUUM INTO + rotación 14 días (`-backup-dir`), `PRAGMA optimize`+checkpoint. Pendiente: rate limiting, métricas Prometheus, cobertura >70%. |
-| 5. Comunidad | ✅ Completada | README EN/ES, instalador one-liner, licencia AGPL-3.0, landing pública en [ghostbird.cloudless.club](https://ghostbird.cloudless.club/) y CI en GitHub Actions. Pendiente: publicar el anuncio de lanzamiento. |
+| 5. Comunidad | ✅ Completada | README EN/ES, instalador one-liner, licencia AGPL-3.0, landing pública en [potoo.cloudless.club](https://potoo.cloudless.club/) y CI en GitHub Actions. Pendiente: publicar el anuncio de lanzamiento. |
 
 ## Deploy con Ghost real (verificado con Ghost 6.57.1)
 
-GhostBird necesita ser alcanzable por (a) los navegadores de los visitantes
+Potoo necesita ser alcanzable por (a) los navegadores de los visitantes
 (tracker) y (b) el navegador del Admin (pipes) → sírvelo bajo el mismo dominio
 que tu Ghost con nginx:
 
@@ -105,8 +105,8 @@ En `config.production.json` (o el env de tu Ghost):
 ```json
 {
   "tinybird": {
-    "workspaceId": "ghostbird-local",
-    "adminToken": "<EL MISMO secreto que pasaste a GhostBird con -admin-token>",
+    "workspaceId": "potoo-local",
+    "adminToken": "<EL MISMO secreto que pasaste a Potoo con -admin-token>",
     "tracker": { "endpoint": "https://TU-SITIO/ghb/api/v1/page_hit", "datasource": "analytics_events" },
     "stats": {
       "endpoint": "http://127.0.0.1:18181",
@@ -117,7 +117,7 @@ En `config.production.json` (o el env de tu Ghost):
 ```
 
 Notas verificadas:
-- `stats.endpoint` (server-side) puede ser `127.0.0.1` si Ghost y GhostBird
+- `stats.endpoint` (server-side) puede ser `127.0.0.1` si Ghost y Potoo
   comparten host. OJO: el guard SSRF de Ghost bloquea IPs privadas en
   `env: production`; con `env: development` funciona directo (así está
   probado). En producción real usa un hostname que resuelva, o el mismo
@@ -128,13 +128,13 @@ Notas verificadas:
 ## Ejecución (Fase 1)
 
 ```sh
-CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o ghostbird ./cmd/ghostbird
-./ghostbird -addr :8080 -db data/ghostbird.db
+CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o potoo ./cmd/potoo
+./potoo -addr :8080 -db data/potoo.db
 ```
 
-Flags (equiv. env `GHOSTBIRD_ADDR`, `GHOSTBIRD_DB`, `GHOSTBIRD_INGEST_TOKEN`,
-`GHOSTBIRD_ADMIN_TOKEN`, `GHOSTBIRD_STATS_TOKEN`, `GHOSTBIRD_TRUST_PROXY`,
-`GHOSTBIRD_RETENTION_DAYS`, `GHOSTBIRD_BACKUP_DIR`, `GHOSTBIRD_LOG_LEVEL`):
+Flags (equiv. env `POTOO_ADDR`, `POTOO_DB`, `POTOO_INGEST_TOKEN`,
+`POTOO_ADMIN_TOKEN`, `POTOO_STATS_TOKEN`, `POTOO_TRUST_PROXY`,
+`POTOO_RETENTION_DAYS`, `POTOO_BACKUP_DIR`, `POTOO_LOG_LEVEL`):
 `-admin-token` activa la auth JWT de los pipes ( ponlo SIEMPRE si el servicio
 es alcanzable desde fuera: sin él, `/v0/pipes/` queda abierto);
 `-ingest-token` activa la auth de `/v0/events`; `-trust-proxy` (default true)
@@ -147,20 +147,20 @@ legible en /proc por cualquier usuario local) + sandbox:
 
 ```ini
 [Unit]
-Description=GhostBird (Tinybird drop-in for Ghost analytics)
+Description=Potoo (Tinybird drop-in for Ghost analytics)
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-User=ghostbird
-Group=ghostbird
-EnvironmentFile=/etc/ghostbird/ghostbird.env   # GHOSTBIRD_ADMIN_TOKEN=...
-ExecStart=/opt/ghostbird/bin/ghostbird
+User=potoo
+Group=potoo
+EnvironmentFile=/etc/potoo/potoo.env   # POTOO_ADMIN_TOKEN=...
+ExecStart=/opt/potoo/bin/potoo
 Restart=always
 RestartSec=10
 NoNewPrivileges=true
 ProtectSystem=strict
-ReadWritePaths=/var/lib/ghostbird
+ReadWritePaths=/var/lib/potoo
 ProtectHome=yes
 PrivateTmp=true
 MemoryMax=256M
@@ -199,7 +199,7 @@ endpoints e2e con SQLite temporal).
 
 ## Decisiones registradas
 
-- **Single binary con collector integrado** (opción B): el usuario de GhostBird despliega un
+- **Single binary con collector integrado** (opción B): el usuario de Potoo despliega un
   solo servicio; TrafficAnalytics (Node) deja de ser necesario. La API `/v0/events` se
   mantiene por compatibilidad para quien prefiera el collector oficial.
 - **Dedup por `event_id`** (UNIQUE + INSERT OR IGNORE) por semántica at-least-once.

@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // pageHitBodyLimit replica el bodyLimit del AS (20 KB).

@@ -29,11 +29,11 @@ var (
 func init() {
 	b, err := referrersData.ReadFile("data/referrers.json")
 	if err != nil {
-		panic("ghostbird: no se pudo leer data/referrers.json: " + err.Error())
+		panic("potoo: no se pudo leer data/referrers.json: " + err.Error())
 	}
 	var m map[string]referrerEntry
 	if err := json.Unmarshal(b, &m); err != nil {
-		panic("ghostbird: referrers.json inválido: " + err.Error())
+		panic("potoo: referrers.json inválido: " + err.Error())
 	}
 	referrersByKey = m
 	referrersBySource = make(map[string]referrerEntry, len(m))

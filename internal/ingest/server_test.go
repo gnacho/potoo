@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/config"
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/config"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // newTestServer monta el handler con una BD temporal.

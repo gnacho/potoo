@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gnacho/ghostbird/internal/config"
-	"github.com/gnacho/ghostbird/internal/metrics"
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/config"
+	"github.com/gnacho/potoo/internal/metrics"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // TestCapCampo: un pathname hostil de 5000 bytes se trunca a 2048 antes de
@@ -78,9 +78,9 @@ func TestMetricsEndpoint(t *testing.T) {
 	m.Handler().ServeHTTP(rec, mreq)
 	out := rec.Body.String()
 	for _, want := range []string{
-		"ghostbird_page_hits_total 1",
-		"ghostbird_bots_total 1",
-		"ghostbird_uptime_seconds",
+		"potoo_page_hits_total 1",
+		"potoo_bots_total 1",
+		"potoo_uptime_seconds",
 	} {
 		if !strings.Contains(out, want) {
 			t.Errorf("metrics sin %q:\n%s", want, out)

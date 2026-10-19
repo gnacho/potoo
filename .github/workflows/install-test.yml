@@ -17,10 +17,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: stable
 
@@ -34,13 +34,20 @@ jobs:
           chmod +x /tmp/fakebin/systemctl
           echo "/tmp/fakebin" >> "$GITHUB_PATH"
 
+      - name: Build local release (fake assets)
+        run: |
+          mkdir -p dist
+          CGO_ENABLED=0 go build -trimpath -ldflags "-s -w" -o dist/potoo-linux-amd64 ./cmd/potoo
+          (cd dist && sha256sum potoo-linux-amd64 > checksums.txt)
+          cat dist/checksums.txt
+
       - name: Run install.sh (dry-run)
-        run: sh install.sh --dry-run
+        run: sh install.sh --dry-run --version 9.9.9 --base-url "file://$GITHUB_WORKSPACE/dist"
 
       - name: Run install.sh (real install)
         run: |
-          GHOSTBIRD_INSTALL_ROOT=/tmp/ghostbird-test sh install.sh
-          test -x /tmp/ghostbird-test/opt/ghostbird/bin/ghostbird
-          test -f /tmp/ghostbird-test/etc/ghostbird/ghostbird.env
-          test -f /tmp/ghostbird-test/etc/systemd/system/ghostbird.service
-          /tmp/ghostbird-test/opt/ghostbird/bin/ghostbird -h
+          POTOO_INSTALL_ROOT=/tmp/potoo-test sh install.sh --version 9.9.9 --base-url "file://$GITHUB_WORKSPACE/dist"
+          test -x /tmp/potoo-test/opt/potoo/bin/potoo
+          test -f /tmp/potoo-test/etc/potoo/potoo.env
+          test -f /tmp/potoo-test/etc/systemd/system/potoo.service
+          /tmp/potoo-test/opt/potoo/bin/potoo -h

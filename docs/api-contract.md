@@ -1,4 +1,4 @@
-# Contrato API Ghost ↔ GhostBird — Resumen ejecutivo (Fase 0)
+# Contrato API Ghost ↔ Potoo — Resumen ejecutivo (Fase 0)
 
 > **Qué es esto**: síntesis del contrato verificado contra código real para implementar un
 > drop-in replacement de Tinybird en Go. Los dos documentos completos con evidencia
@@ -47,7 +47,7 @@ servidor Ghost):
   collector. Barato de implementar: mismo almacenamiento.
 - **SSRF guard**: `request-external.js` de Ghost bloquea en producción URLs que resuelvan a
   IP privada (afecta al flujo 2). Opciones: `env: development` en Ghost, DNS público, o
-  servir GhostBird en el propio host del site. OJO en la fase de integración.
+  servir Potoo en el propio host del site. OJO en la fase de integración.
 
 ## 2. Ingesta — contrato exacto
 
@@ -109,7 +109,7 @@ guión!), y `site_uuid` duplicado dentro del payload.
 string `"null"`; `event_id` puede no ser UUID válido. Tolerancia máxima al parsear.
 
 **Entrega at-least-once** (si se usa TrafficAnalytics delante): batches de 50/1000 ms con
-nack+redelivery completos → **dedup por `event_id`** recomendable en GhostBird
+nack+redelivery completos → **dedup por `event_id`** recomendable en Potoo
 (vía `INSERT OR IGNORE` con UNIQUE index). Hipótesis razonable: para eso existe event_id.
 
 ## 3. Queries — contrato exacto
@@ -172,21 +172,21 @@ Ghost **auto-firma** el JWT con `jsonwebtoken`: **HS256**, secreto = el string
 }
 ```
 
-GhostBird debe validar: firma HS256 con el mismo secreto compartido, `exp`, que exista
+Potoo debe validar: firma HS256 con el mismo secreto compartido, `exp`, que exista
 scope con `resource == pipe pedido` y `fixed_params.site_uuid == query.site_uuid`
 (discrepancia → 403; es el aislamiento multi-tenant). Fallback: tokens estáticos
 (`stats.token` / `stats.local.token`) aceptados como Bearer opaco.
 
-## 4. Config de Ghost para apuntar a GhostBird
+## 4. Config de Ghost para apuntar a Potoo
 
 ```json
 {
   "tinybird": {
-    "workspaceId": "ghostbird",
-    "adminToken": "<secreto compartido con GhostBird>",
+    "workspaceId": "potoo",
+    "adminToken": "<secreto compartido con Potoo>",
     "tracker": { "endpoint": "https://gb.example.com/api/v1/page_hit", "datasource": "analytics_events" },
     "stats": {
-      "endpoint": "http://ghostbird:8080",
+      "endpoint": "http://potoo:8080",
       "endpointBrowser": "https://gb.example.com"
     }
   }

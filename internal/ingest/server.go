@@ -1,4 +1,4 @@
-// Package ingest implementa los endpoints HTTP de GhostBird: el collector
+// Package ingest implementa los endpoints HTTP de Potoo: el collector
 // POST /api/v1/page_hit (lo que llama ghost-stats.js), la Events API
 // POST /v0/events (compatibilidad con TrafficAnalytics como collector) y
 // GET /healthz.
@@ -12,9 +12,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/config"
-	"github.com/gnacho/ghostbird/internal/metrics"
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/config"
+	"github.com/gnacho/potoo/internal/metrics"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // Server es el servicio HTTP de ingesta.

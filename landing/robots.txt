@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ghostbird.cloudless.club/sitemap.xml
+Sitemap: https://potoo.cloudless.club/sitemap.xml

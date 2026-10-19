@@ -1,4 +1,4 @@
-// GhostBird: drop-in replacement self-hosted de Tinybird para las
+// Potoo: drop-in replacement self-hosted de Tinybird para las
 // estadísticas nativas de Ghost 6.x. Un binario, una SQLite, cero config.
 package main
 
@@ -16,12 +16,12 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/config"
-	"github.com/gnacho/ghostbird/internal/gcauth"
-	"github.com/gnacho/ghostbird/internal/ingest"
-	"github.com/gnacho/ghostbird/internal/metrics"
-	"github.com/gnacho/ghostbird/internal/pipes"
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/config"
+	"github.com/gnacho/potoo/internal/gcauth"
+	"github.com/gnacho/potoo/internal/ingest"
+	"github.com/gnacho/potoo/internal/metrics"
+	"github.com/gnacho/potoo/internal/pipes"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 // version se inyecta con -ldflags "-X main.version=...".
@@ -29,7 +29,7 @@ var version = "dev"
 
 func main() {
 	if err := run(); err != nil {
-		slog.Error("ghostbird terminó con error", "error", err)
+		slog.Error("potoo terminó con error", "error", err)
 		os.Exit(1)
 	}
 }
@@ -65,8 +65,8 @@ func run() error {
 		lines := metrics.DBSizeLines(cfg.DBPath)
 		if n, err := st.CountEvents(); err == nil {
 			lines = append(lines,
-				"# HELP ghostbird_events_stored_total Eventos en BD\n# TYPE ghostbird_events_stored_total gauge",
-				fmt.Sprintf("ghostbird_events_stored_total %d", n))
+				"# HELP potoo_events_stored_total Eventos en BD\n# TYPE potoo_events_stored_total gauge",
+				fmt.Sprintf("potoo_events_stored_total %d", n))
 		}
 		return lines
 	})
@@ -100,7 +100,7 @@ func run() error {
 
 	errCh := make(chan error, 1)
 	go func() {
-		log.Info("ghostbird escuchando", "addr", cfg.Addr, "db", cfg.DBPath, "version", version, "trust_proxy", cfg.TrustProxy, "ingest_auth", cfg.IngestToken != "")
+		log.Info("potoo escuchando", "addr", cfg.Addr, "db", cfg.DBPath, "version", version, "trust_proxy", cfg.TrustProxy, "ingest_auth", cfg.IngestToken != "")
 		if err := httpSrv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			errCh <- err
 		}
@@ -128,11 +128,11 @@ func run() error {
 	case <-time.After(15 * time.Second):
 		log.Warn("job nocturno no terminó en la ventana de shutdown; continuando")
 	}
-	log.Info("ghostbird apagado")
+	log.Info("potoo apagado")
 	return nil
 }
 
-// rotateBackups borra backups ghostbird-YYYYMMDD.db con fecha > keepDays.
+// rotateBackups borra backups potoo-YYYYMMDD.db con fecha > keepDays.
 // La fecha sale del NOMBRE (una restauración/copias no refrescan mtime).
 func rotateBackups(dir string, keepDays int, log *slog.Logger) {
 	entries, err := os.ReadDir(dir)
@@ -142,10 +142,19 @@ func rotateBackups(dir string, keepDays int, log *slog.Logger) {
 	cutoff := time.Now().UTC().AddDate(0, 0, -keepDays).Format("20060102")
 	for _, e := range entries {
 		name := e.Name()
-		if e.IsDir() || !strings.HasPrefix(name, "ghostbird-") || !strings.HasSuffix(name, ".db") {
+		if e.IsDir() {
 			continue
 		}
-		date := strings.TrimSuffix(strings.TrimPrefix(name, "ghostbird-"), ".db")
+		if strings.HasSuffix(name, ".tmp") {
+			if err := os.Remove(filepath.Join(dir, name)); err == nil {
+				log.Info("tmp huérfano borrado", "file", name)
+			}
+			continue
+		}
+		if !strings.HasPrefix(name, "potoo-") || !strings.HasSuffix(name, ".db") {
+			continue
+		}
+		date := strings.TrimSuffix(strings.TrimPrefix(name, "potoo-"), ".db")
 		if len(date) != 8 || date >= cutoff {
 			continue
 		}
@@ -153,13 +162,6 @@ func rotateBackups(dir string, keepDays int, log *slog.Logger) {
 			log.Info("backup rotado", "file", name)
 		}
 	}
-	// Limpieza de .tmp huérfanos (backup interrumpido).
-	_ = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err == nil && !info.IsDir() && strings.HasSuffix(path, ".tmp") {
-			_ = os.Remove(path)
-		}
-		return nil
-	})
 }
 
 func newLogger(level string) *slog.Logger {
@@ -203,7 +205,7 @@ func nightlyJob(ctx context.Context, cfg *config.Config, st *store.Store, log *s
 		}
 		// Backup diario verificado (VACUUM INTO, tmp+rename).
 		if cfg.BackupDir != "" {
-			dest := filepath.Join(cfg.BackupDir, "ghostbird-"+time.Now().UTC().Format("20060102")+".db")
+			dest := filepath.Join(cfg.BackupDir, "potoo-"+time.Now().UTC().Format("20060102")+".db")
 			if err := st.Backup(dest); err != nil {
 				log.Warn("backup diario", "error", err)
 			} else {

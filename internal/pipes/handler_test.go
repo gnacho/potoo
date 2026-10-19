@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/gnacho/ghostbird/internal/config"
-	"github.com/gnacho/ghostbird/internal/store"
+	"github.com/gnacho/potoo/internal/config"
+	"github.com/gnacho/potoo/internal/store"
 )
 
 func newPipesServer(t *testing.T, cfg *config.Config) (*httptest.Server, *store.Store) {
