@@ -1,6 +1,6 @@
+"use strict";
 /* Potoo landing: i18n ES/EN (tema Luminex) */
-const I18N = {
-  es: {
+const es = {
     "meta.title": "Potoo: alternativa libre y autoalojada a Tinybird para Ghost",
     "meta.desc": "Reemplazo abierto y autoalojado para las estadísticas nativas de Ghost 6.x. Alternativa a Tinybird con un binario Go, SQLite y AGPL-3.0. Sin telemetría.",
     "misc.skip": "Saltar al contenido",
@@ -123,9 +123,8 @@ const I18N = {
     "f.kofi": "ko-fi.com/gnacho",
     "f.gh": "GitHub",
     "f.notaff": "Proyecto independiente. Sin afiliación con Ghost Foundation ni Tinybird."
-  },
-
-  en: {
+};
+const en = {
     "meta.title": "Potoo: open source Tinybird alternative for Ghost analytics",
     "meta.desc": "Open-source, self-hosted drop-in replacement for Ghost 6 native analytics. One Go binary, one SQLite file, AGPL-3.0. A Tinybird alternative with zero telemetry.",
     "misc.skip": "Skip to content",
@@ -186,7 +185,7 @@ const I18N = {
     "gallery.title": "Not a mockup",
     "gallery.sub": "Screenshot from the native Ghost dashboard (Ghost 6.57) fed by Potoo, simulating Business Insider data: 2.4M unique visitors, sessions, sources and top posts.",
     "gallery.cap1": "Overview: visitors, sessions and sources for Business Insider",
-    "gallery.alt1": "Screenshot of the Ghost dashboard: overview with 2.4M unique visitors, sessions and traffic sources for Business Insider",
+    "gallery.alt1": "Screenshot of the Ghost dashboard: overview with 2.4M unique visitors, sessions, sources and traffic sources for Business Insider",
     "gallery.open1": "Enlarge the screenshot: Business Insider overview",
     "gallery.lb": "Enlarged screenshot",
     "gallery.close": "Close",
@@ -248,5 +247,5 @@ const I18N = {
     "f.kofi": "ko-fi.com/gnacho",
     "f.gh": "GitHub",
     "f.notaff": "Independent project. Not affiliated with the Ghost Foundation or Tinybird."
-  }
 };
+const I18N = { es, en };

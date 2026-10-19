@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "description": "TypeScript sources for the static Potoo landing. Build emits plain i18n.js/app.js so the site stays bundler-free.",
+  "scripts": {
+    "build": "tsc -p .",
+    "check": "tsc -p . --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

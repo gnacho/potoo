@@ -16,3 +16,6 @@ dist/
 .idea/
 .vscode/
 .DS_Store
+
+# Node (landing TS toolchain)
+node_modules/
